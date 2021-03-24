@@ -36,7 +36,7 @@ with open("./requirements.txt", "r", encoding="utf-8") as r:
     requirements = r.readlines()
 
 setup(
-    name='neon-stt-plugin-googlecloudbeta',
+    name='neon-stt-plugin-google_cloud_streaming',
     version=version,
     description='A Google streaming stt plugin for Neon',
     long_description=long_description,
