@@ -71,14 +71,11 @@ class GoogleCloudStreamingSTT(StreamingSTT):
             encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
             language_code=self.language,
-            alternative_language_codes=self.alt_langs,
-            # model='command_and_search',
             max_alternatives=3
         )
         self.streaming_config = types.StreamingRecognitionConfig(
             config=recognition_config,
             interim_results=False
-            # single_utterance=True,
         )
 
     def create_streaming_thread(self):
