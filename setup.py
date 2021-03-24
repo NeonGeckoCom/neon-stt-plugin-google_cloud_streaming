@@ -19,7 +19,7 @@
 
 from setuptools import setup
 
-PLUGIN_ENTRY_POINT = 'google_cloud_streaming = neon_stt_plugin_google_cloud_streaming:GoogleCloudSTT'
+PLUGIN_ENTRY_POINT = 'google_cloud_streaming = neon_stt_plugin_google_cloud_streaming:GoogleCloudStreamingSTT'
 
 with open("README.md", "r") as f:
     long_description = f.read()
