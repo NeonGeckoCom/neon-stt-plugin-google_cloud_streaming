@@ -24,9 +24,9 @@ from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
 from google.oauth2.service_account import Credentials
-
-from mycroft.stt import StreamingSTT, StreamThread
-from mycroft.util.log import LOG
+from neon_utils.plugins.stt import StreamingSTT, StreamThread
+from neon_utils.logger import LOG
+LOG.name = "stt_plugin"
 
 
 class GoogleCloudStreamingSTT(StreamingSTT):
@@ -46,11 +46,10 @@ class GoogleCloudStreamingSTT(StreamingSTT):
 
     """
 
-    def __init__(self, results_event=None):
-        super(GoogleCloudStreamingSTT, self).__init__(results_event)
+    def __init__(self, results_event=None, config=None):
+        super(GoogleCloudStreamingSTT, self).__init__(results_event, config)
         # override language with module specific language selection
         self.language = self.config.get('lang') or self.lang
-        self.alt_langs = self.conf['speech']['alt_languages']
         self.queue = None
 
         if not self.credential.get("json"):
