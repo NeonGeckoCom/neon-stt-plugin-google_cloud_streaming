@@ -52,9 +52,10 @@ class GoogleCloudStreamingSTT(StreamingSTT):
         self.language = self.config.get('lang') or self.lang
         self.queue = None
 
-        if not self.credential.get("json"):
-            self.credential["json"] = self.credential
-        if self.credential.get("json"):
+        if self.credential:
+            if not self.credential.get("json"):
+                self.credential["json"] = self.credential
+            LOG.debug(f"Got credentials: {self.credential}")
             credentials = Credentials.from_service_account_info(
                 self.credential.get('json')
             )
