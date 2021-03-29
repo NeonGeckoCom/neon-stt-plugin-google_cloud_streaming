@@ -50,7 +50,7 @@ class TestGetSTT(unittest.TestCase):
             except EOFError:
                 pass
 
-            result = self.stt.execute(None)
+            result = [r.lower() for r in self.stt.execute(None)]
             self.assertIn(transcription, result)
 
 
