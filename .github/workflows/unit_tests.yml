@@ -7,6 +7,9 @@ on:
 
 jobs:
   unit_tests:
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.8, 3.9 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -18,6 +21,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install git+https://github.com/hellochatterbox/holmesV
       - name: Get Credential
         run: |
             mkdir -p ~/.local/share/neon
