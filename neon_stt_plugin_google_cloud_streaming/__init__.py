@@ -70,11 +70,12 @@ class GoogleCloudStreamingSTT(StreamingSTT):
                 self.credential.get('json')
             )
         else:
-            import os
-            cred_file = os.path.expanduser("~/.local/share/neon/google.json")
-            if os.path.isfile(cred_file):
-                credentials = Credentials.from_service_account_file(cred_file)
-            else:
+            try:
+                from neon_utils.authentication_utils import find_neon_google_keys
+                credential_json = find_neon_google_keys()
+                credentials = Credentials.from_service_account_info(credential_json)
+            except Exception as e:
+                LOG.error(e)
                 credentials = None
         self.client = speech.SpeechClient(credentials=credentials)
         recognition_config = types.RecognitionConfig(
