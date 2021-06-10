@@ -21,8 +21,6 @@
 from inspect import signature
 from queue import Queue
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
 from google.oauth2.service_account import Credentials
 from neon_utils.logger import LOG
 
@@ -78,13 +76,13 @@ class GoogleCloudStreamingSTT(StreamingSTT):
                 LOG.error(e)
                 credentials = None
         self.client = speech.SpeechClient(credentials=credentials)
-        recognition_config = types.RecognitionConfig(
-            encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
+        recognition_config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
             language_code=self.language,
             max_alternatives=3
         )
-        self.streaming_config = types.StreamingRecognitionConfig(
+        self.streaming_config = speech.StreamingRecognitionConfig(
             config=recognition_config,
             interim_results=False
         )
@@ -109,7 +107,7 @@ class GoogleStreamThread(StreamThread):
         self.transcriptions = []
 
     def handle_audio_stream(self, audio, language):
-        req = (types.StreamingRecognizeRequest(audio_content=x) for x in audio)
+        req = (speech.StreamingRecognizeRequest(audio_content=x) for x in audio)
         responses = self.client.streaming_recognize(self.streaming_config, req)
         # Responses are yielded, but we will return once the first sentence is transcribed
         for res in responses:
