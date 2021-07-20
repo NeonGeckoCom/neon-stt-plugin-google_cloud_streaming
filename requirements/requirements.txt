@@ -3,3 +3,4 @@ google-api-python-client==1.6.4
 SpeechRecognition~=3.8.1
 ovos_plugin_manager
 neon-utils>=0.5.7
+phoneme_guesser
