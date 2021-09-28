@@ -50,11 +50,13 @@ class GoogleCloudStreamingSTT(StreamingSTT):
     """
 
     def __init__(self, results_event=None, config=None):
-        if len(signature(super(GoogleCloudStreamingSTT, self).__init__).parameters) == 2:
-            super(GoogleCloudStreamingSTT, self).__init__(results_event, config)
-        else:
-            LOG.warning(f"Shorter Signature Found; config will be ignored and results_event will not be handled!")
+        if len(signature(super(GoogleCloudStreamingSTT, self).__init__).parameters) == 0:
+            LOG.warning(f"Deprecated Signature Found; config will be ignored and results_event will not be handled!")
             super(GoogleCloudStreamingSTT, self).__init__()
+        else:
+            super(GoogleCloudStreamingSTT, self).__init__(results_event=results_event, config=config)
+
+        if not hasattr(self, "results_event"):
             self.results_event = None
         # override language with module specific language selection
         self.language = self.config.get('lang') or self.lang
