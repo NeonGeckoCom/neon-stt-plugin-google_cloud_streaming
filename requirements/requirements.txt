@@ -1,6 +1,6 @@
 google-cloud-speech~=2.4.0
 google-api-python-client==1.6.4
 SpeechRecognition~=3.8.1
-ovos-plugin-manager<=0.0.1a8
+ovos-plugin-manager~=0.0.1
 neon-utils>=0.5.7
 phoneme_guesser
