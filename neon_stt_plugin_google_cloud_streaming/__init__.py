@@ -29,8 +29,6 @@ try:
 except ImportError:
     from ovos_plugin_manager.templates.stt import StreamingSTT, StreamThread
 
-LOG.name = "stt_plugin"
-
 
 class GoogleCloudStreamingSTT(StreamingSTT):
     """
