@@ -10,7 +10,13 @@ license_overrides = {
     'yt-dlp': "Unlicense",
     'pyxdg': 'GPL-2.0',
     'ptyprocess': 'ISC license',
-    'psutil': 'BSD3'
+    'psutil': 'BSD3',
+    'soupsieve': 'MIT',
+    'setuptools': 'MIT',
+    "python-dateutil": "Apache-2.0",
+    "pyparsing": "MIT",
+    "typing-extensions": "PSF",
+    "exceptiongroup": "MIT"
 }
 # explicitly allow these packages that would fail otherwise
 whitelist = []
