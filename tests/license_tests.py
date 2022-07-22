@@ -19,7 +19,9 @@ license_overrides = {
     "exceptiongroup": "MIT"
 }
 # explicitly allow these packages that would fail otherwise
-whitelist = []
+whitelist = [
+    "neon-stt-plugin-google_cloud_streaming"
+]
 
 # validation flags
 allow_nonfree = False
