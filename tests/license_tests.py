@@ -20,7 +20,8 @@ license_overrides = {
 }
 # explicitly allow these packages that would fail otherwise
 whitelist = [
-    "neon-stt-plugin-google_cloud_streaming"
+    "neon-stt-plugin-google_cloud_streaming",
+    "neon_api_proxy"
 ]
 
 # validation flags
