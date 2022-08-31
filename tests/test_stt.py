@@ -89,7 +89,7 @@ class TestGetSTT(unittest.TestCase):
             result = stt.execute(None)
             self.assertIsNotNone(result, f"Error processing: {file}")
             self.assertIsInstance(result, list)
-            self.assertIn(transcription, result)
+            self.assertIn(transcription, (r.lower() for r in result))
 
 
 if __name__ == '__main__':
