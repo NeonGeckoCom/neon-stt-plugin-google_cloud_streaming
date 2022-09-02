@@ -18,16 +18,14 @@
 # SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from inspect import signature
+
 from queue import Queue
+from threading import Event
+
 from google.cloud import speech
 from google.oauth2.service_account import Credentials
-from neon_utils.logger import LOG
-
-try:
-    from neon_speech.stt import StreamingSTT, StreamThread
-except ImportError:
-    from ovos_plugin_manager.templates.stt import StreamingSTT, StreamThread
+from ovos_utils.log import LOG
+from ovos_plugin_manager.templates.stt import StreamingSTT, StreamThread
 
 
 class GoogleCloudStreamingSTT(StreamingSTT):
@@ -47,15 +45,10 @@ class GoogleCloudStreamingSTT(StreamingSTT):
 
     """
 
-    def __init__(self, results_event=None, config=None):
-        if len(signature(super(GoogleCloudStreamingSTT, self).__init__).parameters) == 0:
-            LOG.warning(f"Deprecated Signature Found; config will be ignored and results_event will not be handled!")
-            super(GoogleCloudStreamingSTT, self).__init__()
-        else:
-            super(GoogleCloudStreamingSTT, self).__init__(results_event=results_event, config=config)
+    def __init__(self, config=None, **kwargs):
+        super(GoogleCloudStreamingSTT, self).__init__(config=config)
+        self.results_event = kwargs.get("results_event")
 
-        if not hasattr(self, "results_event"):
-            self.results_event = None
         # override language with module specific language selection
         self.language = self.config.get('lang') or self.lang
         self.queue = None
@@ -101,9 +94,10 @@ class GoogleCloudStreamingSTT(StreamingSTT):
 class GoogleStreamThread(StreamThread):
     def __init__(self, queue, lang, client, streaming_config, results_event=None):
         super().__init__(queue, lang)
+        self.name = "StreamThread"
         self.client = client
         self.streaming_config = streaming_config
-        self.results_event = results_event
+        self.results_event = results_event or Event()
         self.transcriptions = []
 
     def handle_audio_stream(self, audio, language):
@@ -118,9 +112,12 @@ class GoogleStreamThread(StreamThread):
                 for alternative in res.results[0].alternatives:
                     transcription = alternative.transcript
                     self.transcriptions.append(transcription)
-                LOG.debug(self.transcriptions)
-            if self.results_event:
-                self.results_event.set()
-            if self.transcriptions:
-                self.text = self.transcriptions[0]  # Mycroft compat.
-            return self.transcriptions
+        LOG.debug(self.transcriptions)
+        self.results_event.set()
+        if self.transcriptions:
+            self.text = self.transcriptions[0]  # Mycroft compat.
+        return self.transcriptions
+
+    def finalize(self):
+        self.results_event.wait()
+        return super().finalize()
