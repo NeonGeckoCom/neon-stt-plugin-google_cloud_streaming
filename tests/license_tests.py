@@ -16,7 +16,8 @@ license_overrides = {
     "python-dateutil": "Apache-2.0",
     "pyparsing": "MIT",
     "typing-extensions": "PSF",
-    "exceptiongroup": "MIT"
+    "exceptiongroup": "MIT",
+    "idna": "BSD3"
 }
 # explicitly allow these packages that would fail otherwise
 whitelist = [
