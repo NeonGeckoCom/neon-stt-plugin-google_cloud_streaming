@@ -34,6 +34,8 @@ from google.oauth2.service_account import Credentials
 from ovos_utils.log import LOG
 from ovos_plugin_manager.templates.stt import StreamingSTT, StreamThread
 
+from neon_stt_plugin_google_cloud_streaming.languages import stt_config
+
 
 class GoogleCloudStreamingSTT(StreamingSTT):
     """
@@ -96,6 +98,10 @@ class GoogleCloudStreamingSTT(StreamingSTT):
             self.streaming_config,
             self.results_event
         )
+
+    @property
+    def available_languages(self) -> set:
+        return set(stt_config.keys())
 
 
 class GoogleStreamThread(StreamThread):
