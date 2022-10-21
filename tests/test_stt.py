@@ -98,6 +98,11 @@ class TestGetSTT(unittest.TestCase):
             self.assertIsInstance(result, list)
             self.assertIn(transcription, (r.lower() for r in result))
 
+    def test_available_languages(self):
+        stt = GoogleCloudStreamingSTT()
+        self.assertIsInstance(stt.available_languages, set)
+        self.assertIn('en-US', stt.available_languages)
+
 
 if __name__ == '__main__':
     unittest.main()
