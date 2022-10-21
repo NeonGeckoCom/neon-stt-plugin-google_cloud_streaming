@@ -34,7 +34,7 @@ from google.oauth2.service_account import Credentials
 from ovos_utils.log import LOG
 from ovos_plugin_manager.templates.stt import StreamingSTT, StreamThread
 
-from neon_stt_plugin_deepspeech_stream_local.languages import stt_config
+from neon_stt_plugin_google_cloud_streaming.languages import stt_config
 
 
 class GoogleCloudStreamingSTT(StreamingSTT):
