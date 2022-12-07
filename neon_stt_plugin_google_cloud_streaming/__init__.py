@@ -79,11 +79,7 @@ class GoogleCloudStreamingSTT(StreamingSTT):
                 LOG.error(e)
                 credentials = None
 
-        retry = google.api_core.retry.Retry(timeout=30)
-        timeout = 30
-
-        self.client = speech.SpeechClient(credentials=credentials, retry=retry,
-                                          timeout=timeout)
+        self.client = speech.SpeechClient(credentials=credentials)
         recognition_config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
@@ -115,13 +111,17 @@ class GoogleStreamThread(StreamThread):
         super().__init__(queue, lang)
         self.name = "StreamThread"
         self.client = client
+        self.retry = google.api_core.retry.Retry(timeout=30)
+        self.timeout = 30
         self.streaming_config = streaming_config
         self.results_event = results_event or Event()
         self.transcriptions = []
 
     def handle_audio_stream(self, audio, language):
         req = (speech.StreamingRecognizeRequest(audio_content=x) for x in audio)
-        responses = self.client.streaming_recognize(self.streaming_config, req)
+        responses = self.client.streaming_recognize(self.streaming_config, req,
+                                                    timeout=self.timeout,
+                                                    retry=self.retry)
         # Responses are yielded, but we will return once the first sentence is transcribed
         for res in responses:
             for result in res.results:
