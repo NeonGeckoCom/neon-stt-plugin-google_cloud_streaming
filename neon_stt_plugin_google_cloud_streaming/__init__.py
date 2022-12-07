@@ -29,6 +29,7 @@
 from queue import Queue
 from threading import Event
 
+import google.api_core.retry
 from google.cloud import speech
 from google.oauth2.service_account import Credentials
 from ovos_utils.log import LOG
@@ -77,7 +78,12 @@ class GoogleCloudStreamingSTT(StreamingSTT):
             except Exception as e:
                 LOG.error(e)
                 credentials = None
-        self.client = speech.SpeechClient(credentials=credentials)
+
+        retry = google.api_core.retry.Retry(timeout=30)
+        timeout = 30
+
+        self.client = speech.SpeechClient(credentials=credentials, retry=retry,
+                                          timeout=timeout)
         recognition_config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=16000,
