@@ -72,7 +72,7 @@ setup(
     url='https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming',
     author='Neongecko',
     author_email='developers@neon.ai',
-    license='NeonAI License v1.0',
+    license='BSD-3',
     packages=['neon_stt_plugin_google_cloud_streaming'],
     install_requires=get_requirements("requirements.txt"),
     zip_safe=True,
