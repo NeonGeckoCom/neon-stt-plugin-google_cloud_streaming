@@ -3,3 +3,4 @@ google-api-python-client~=1.6
 SpeechRecognition~=3.8
 ovos-plugin-manager~=0.0.1
 ovos-utils~=0.0
+google-api-core~=2.11
