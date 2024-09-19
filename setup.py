@@ -56,7 +56,7 @@ CONFIG_ENTRY_POINT = 'google_cloud_streaming.config = neon_stt_plugin_google_clo
 with open(path.join(BASE_PATH, "README.md"), "r") as f:
     long_description = f.read()
 
-with open(join(BASE_PATH, "version.py"), "r", encoding="utf-8") as v:
+with open(path.join(BASE_PATH, "version.py"), "r", encoding="utf-8") as v:
     for line in v.readlines():
         if line.startswith("__version__"):
             if '"' in line:
