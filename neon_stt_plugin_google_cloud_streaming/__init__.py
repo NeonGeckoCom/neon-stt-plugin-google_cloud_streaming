@@ -57,7 +57,6 @@ class GoogleCloudStreamingSTT(StreamingSTT):
 
     def __init__(self, config=None, **kwargs):
         super(GoogleCloudStreamingSTT, self).__init__(config=config)
-        self.results_event = kwargs.get("results_event")
 
         # override language with module specific language selection
         self.language = self.config.get('lang') or self.lang
@@ -97,24 +96,26 @@ class GoogleCloudStreamingSTT(StreamingSTT):
             self.queue,
             self.language,
             self.client,
-            self.streaming_config,
-            self.results_event
+            self.streaming_config
         )
 
     @property
     def available_languages(self) -> set:
         return set(stt_config.keys())
 
+    def transcribe(self, *args, **kwargs):
+        return self.stream.transcriptions or []
+
 
 class GoogleStreamThread(StreamThread):
-    def __init__(self, queue, lang, client, streaming_config, results_event=None):
+    def __init__(self, queue, lang, client, streaming_config):
         super().__init__(queue, lang)
         self.name = "StreamThread"
         self.client = client
         self.retry = google.api_core.retry.Retry(timeout=30)
         self.timeout = 30
         self.streaming_config = streaming_config
-        self.results_event = results_event or Event()
+        self.results_event = Event()
         self.transcriptions = []
 
     def handle_audio_stream(self, audio, language):
@@ -130,11 +131,12 @@ class GoogleStreamThread(StreamThread):
                 self.transcriptions = []
                 for alternative in res.results[0].alternatives:
                     transcription = alternative.transcript
-                    self.transcriptions.append(transcription)
+                    confidence = alternative.confidence
+                    self.transcriptions.append((transcription, confidence))
         LOG.debug(self.transcriptions)
         self.results_event.set()
         if self.transcriptions:
-            self.text = self.transcriptions[0]  # Mycroft compat.
+            self.text = self.transcriptions[0][0]  # Backwards compat.
         return self.transcriptions
 
     def finalize(self):

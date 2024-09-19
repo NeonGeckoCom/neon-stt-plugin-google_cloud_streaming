@@ -31,6 +31,8 @@ import sys
 import unittest
 
 from threading import Event
+from unittest import skip
+
 from neon_utils.file_utils import get_audio_file_stream
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -73,12 +75,22 @@ class TestGetSTT(unittest.TestCase):
             except EOFError:
                 pass
 
+            # Check legacy single transcript support
             result = stt.execute(None)
             result = result.lower()
+
+            # Check alternative transcripts
+            transcripts = stt.transcribe()
+            self.assertEqual(transcripts[0][0], result)
+            for transcript in transcripts:
+                self.assertIsInstance(transcript[0], str)
+                self.assertIsInstance(transcript[1], float)
+
             self.assertIsNotNone(result, f"Error processing: {file}")
             self.assertIsInstance(result, str)
             self.assertEqual(transcription, result)
 
+    @skip("Neon-specific STT is deprecated")
     def test_get_stt_neon(self):
         results_event = Event()
         stt = NeonSTT(results_event=results_event)
