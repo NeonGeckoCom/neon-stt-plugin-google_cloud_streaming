@@ -25,7 +25,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+from copy import copy
 from queue import Queue
 from threading import Event
 
@@ -62,13 +62,12 @@ class GoogleCloudStreamingSTT(StreamingSTT):
         self.language = self.config.get('lang') or self.lang
         self.queue = None
 
-        if self.credential:
-            if not self.credential.get("json"):
-                self.credential["json"] = self.credential
-            LOG.debug(f"Got credentials: {self.credential}")
-            credentials = Credentials.from_service_account_info(
-                self.credential.get('json')
-            )
+        creds = self.config.get("credential")
+
+        if creds:
+            creds = creds.get('json') or creds
+            LOG.debug(f"Got credentials: {creds}")
+            credentials = Credentials.from_service_account_info(creds)
         else:
             try:
                 from neon_utils.authentication_utils import find_neon_google_keys
@@ -104,7 +103,11 @@ class GoogleCloudStreamingSTT(StreamingSTT):
         return set(stt_config.keys())
 
     def transcribe(self, *args, **kwargs):
-        return self.stream.transcriptions or []
+        self.queue.put(None)
+        self.stream.results_event.wait()
+        result = copy(self.stream.transcriptions)
+        self.stream_stop()
+        return result or []
 
 
 class GoogleStreamThread(StreamThread):

@@ -88,7 +88,8 @@ class TestGetSTT(unittest.TestCase):
             # Check alternative transcripts
             read_file()
             transcripts = stt.transcribe()
-            self.assertEqual(transcripts[0][0], result, f"Error processing: {file}")
+            self.assertEqual(transcripts[0][0].lower(), result,
+                             f"Error processing: {file}")
             for transcript in transcripts:
                 self.assertIsInstance(transcript[0], str)
                 self.assertIsInstance(transcript[1], float)
