@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2a6](https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming/tree/1.0.2a6) (2025-03-14)
+
+[Full Changelog](https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming/compare/1.0.2a5...1.0.2a6)
+
+**Merged pull requests:**
+
+- Enable license tests on `push` [\#48](https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming/pull/48) ([NeonDaniel](https://github.com/NeonDaniel))
+
 ## [1.0.2a5](https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming/tree/1.0.2a5) (2025-03-14)
 
 [Full Changelog](https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming/compare/1.0.1...1.0.2a5)
