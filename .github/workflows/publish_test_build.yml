@@ -15,3 +15,5 @@ jobs:
     with:
       version_file: "version.py"
       setup_py: "setup.py"
+      publish_prerelease: true
+      update_changelog: true
