@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -25,7 +25,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+from copy import copy
 from queue import Queue
 from threading import Event
 
@@ -57,19 +57,17 @@ class GoogleCloudStreamingSTT(StreamingSTT):
 
     def __init__(self, config=None, **kwargs):
         super(GoogleCloudStreamingSTT, self).__init__(config=config)
-        self.results_event = kwargs.get("results_event")
 
         # override language with module specific language selection
         self.language = self.config.get('lang') or self.lang
         self.queue = None
 
-        if self.credential:
-            if not self.credential.get("json"):
-                self.credential["json"] = self.credential
-            LOG.debug(f"Got credentials: {self.credential}")
-            credentials = Credentials.from_service_account_info(
-                self.credential.get('json')
-            )
+        creds = self.config.get("credential")
+
+        if creds:
+            creds = creds.get('json') or creds
+            LOG.debug(f"Got credentials: {creds}")
+            credentials = Credentials.from_service_account_info(creds)
         else:
             try:
                 from neon_utils.authentication_utils import find_neon_google_keys
@@ -97,24 +95,30 @@ class GoogleCloudStreamingSTT(StreamingSTT):
             self.queue,
             self.language,
             self.client,
-            self.streaming_config,
-            self.results_event
+            self.streaming_config
         )
 
     @property
     def available_languages(self) -> set:
         return set(stt_config.keys())
 
+    def transcribe(self, *args, **kwargs):
+        self.queue.put(None)
+        self.stream.results_event.wait()
+        result = copy(self.stream.transcriptions)
+        self.stream_stop()
+        return result or []
+
 
 class GoogleStreamThread(StreamThread):
-    def __init__(self, queue, lang, client, streaming_config, results_event=None):
+    def __init__(self, queue, lang, client, streaming_config):
         super().__init__(queue, lang)
         self.name = "StreamThread"
         self.client = client
         self.retry = google.api_core.retry.Retry(timeout=30)
         self.timeout = 30
         self.streaming_config = streaming_config
-        self.results_event = results_event or Event()
+        self.results_event = Event()
         self.transcriptions = []
 
     def handle_audio_stream(self, audio, language):
@@ -130,11 +134,12 @@ class GoogleStreamThread(StreamThread):
                 self.transcriptions = []
                 for alternative in res.results[0].alternatives:
                     transcription = alternative.transcript
-                    self.transcriptions.append(transcription)
+                    confidence = alternative.confidence
+                    self.transcriptions.append((transcription, confidence))
         LOG.debug(self.transcriptions)
         self.results_event.set()
         if self.transcriptions:
-            self.text = self.transcriptions[0]  # Mycroft compat.
+            self.text = self.transcriptions[0][0]  # Backwards compat.
         return self.transcriptions
 
     def finalize(self):
